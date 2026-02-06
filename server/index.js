@@ -3,6 +3,7 @@ const { createServer } = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const { legonStops, defaultRoute } = require('./routes');
+require('dotenv').config();
 
 const app = express();
 const httpServer = createServer(app);
@@ -50,7 +51,7 @@ app.get('/health', (req, res) => {
 // Config endpoint for driver app (secrets from env)
 app.get('/api/config', (req, res) => {
     res.json({
-        MAPBOX_TOKEN: process.env.MAPBOX_TOKEN || 'pk.eyJ1Ijoiam9zaDExOSIsImEiOiJjbHhqOHhkd2IxdTQ5MmtzaWdyM2JpczlwIn0.J04XlsjDCtkSuBf4cbXx7A'
+        MAPBOX_TOKEN: process.env.MAPBOX_TOKEN
     });
 });
 
