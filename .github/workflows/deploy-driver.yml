@@ -25,9 +25,11 @@ jobs:
       
       - name: Update config with production server URL
         run: |
+          echo "Before:"
           cat driver-app/config.js
-          sed -i "s|http://localhost:3001|https://axis-0fgu.onrender.com|g" driver-app/config.js
-          echo "--- After replacement ---"
+          sed -i 's/http:\/\/localhost:3001/https:\/\/axis-0fgu.onrender.com/g' driver-app/config.js
+          echo ""
+          echo "After:"
           cat driver-app/config.js
       
       - name: Setup Pages
