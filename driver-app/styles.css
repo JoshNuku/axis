@@ -1,0 +1,233 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* iOS Dark Mode */
+  --bg: #000;
+  --bg-secondary: #1c1c1e;
+  --bg-tertiary: #2c2c2e;
+  --accent: #007aff;
+  --success: #30d158;
+  --danger: #ff453a;
+  --text: #fff;
+  --text-secondary: #8e8e93;
+  --separator: #38383a;
+  --card-shadow: none;
+}
+
+/* iOS Light Mode */
+body.light {
+  --bg: #f2f2f7;
+  --bg-secondary: #fff;
+  --bg-tertiary: #e5e5ea;
+  --text: #000;
+  --text-secondary: #6e6e73;
+  --separator: #c6c6c8;
+  --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  padding-top: env(safe-area-inset-top, 16px);
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+  max-width: 428px;
+  margin: 0 auto;
+}
+
+/* Header - iOS style */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  margin-bottom: 16px;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  background: var(--bg-secondary);
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--card-shadow);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+}
+
+.status.connected .status-dot {
+  background: var(--success);
+}
+
+.status.sharing .status-dot {
+  background: var(--accent);
+}
+
+/* Main */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Mini Map - iOS Card */
+#miniMap {
+  width: 100%;
+  height: 200px;
+  background: var(--bg-secondary);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+
+/* Location Card - iOS style */
+.location-card {
+  background: var(--bg-secondary);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--card-shadow);
+}
+
+.location-label {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.coordinates {
+  font-size: 1rem;
+  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+  font-weight: 500;
+}
+
+.coord-waiting {
+  color: var(--text-secondary);
+}
+
+.coord-lat,
+.coord-lng {
+  display: block;
+  margin: 3px 0;
+}
+
+.accuracy {
+  margin-top: 10px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Share Button - iOS Primary Button */
+.share-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'Inter', -apple-system, sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 0.1s, opacity 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.share-btn:disabled {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.share-btn:not(:disabled):active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+.share-btn.active {
+  background: var(--danger);
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
+
+.btn-text {
+  font-size: 1rem;
+}
+
+/* Info Panel */
+.info-panel {
+  text-align: center;
+  padding: 12px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.info-panel.sharing {
+  color: var(--success);
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 16px 0;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  margin-top: auto;
+}

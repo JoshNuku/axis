@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#111">
+  <title>Axis - Driver</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>🚌 Axis Driver</h1>
+      <div class="header-right">
+        <button class="theme-toggle" id="themeToggle">☀️</button>
+        <div class="status" id="connectionStatus">
+          <span class="status-dot"></span>
+          <span class="status-text">Connecting...</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div id="miniMap"></div>
+
+      <div class="location-card" id="locationCard">
+        <div class="location-label">Your Location</div>
+        <div class="coordinates" id="coordinates">
+          <span class="coord-waiting">Waiting for GPS...</span>
+        </div>
+        <div class="accuracy" id="accuracy"></div>
+      </div>
+
+      <button class="share-btn" id="shareBtn" disabled>
+        <span class="btn-text">Start Sharing</span>
+      </button>
+
+      <div class="info-panel" id="infoPanel">
+        <p>Tap the button above to start sharing your location with passengers.</p>
+      </div>
+    </main>
+
+    <footer>
+      <p>Axis Shuttle Tracker</p>
+    </footer>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>

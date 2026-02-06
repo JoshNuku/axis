@@ -1,0 +1,416 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* iOS Dark Mode */
+  --bg: #000;
+  --bg-secondary: #1c1c1e;
+  --bg-tertiary: #2c2c2e;
+  --accent: #007aff;
+  --success: #30d158;
+  --warning: #ff9f0a;
+  --text: #fff;
+  --text-secondary: #8e8e93;
+  --separator: #38383a;
+  --card-shadow: none;
+}
+
+/* iOS Light Mode */
+.app.light {
+  --bg: #f2f2f7;
+  --bg-secondary: #fff;
+  --bg-tertiary: #e5e5ea;
+  --text: #000;
+  --text-secondary: #6e6e73;
+  --separator: #c6c6c8;
+  --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: var(--bg);
+}
+
+/* Header - iOS style */
+.app-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  padding-top: env(safe-area-inset-top, 16px);
+}
+
+.app-header h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  background: var(--bg-secondary);
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--card-shadow);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.connection-status .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--warning);
+}
+
+.connection-status.connected .status-dot {
+  background: var(--success);
+}
+
+/* Main (Map) */
+.app-main {
+  flex: 1;
+  position: relative;
+}
+
+.map-wrapper {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.map-container {
+  height: 100%;
+  width: 100%;
+}
+
+.map-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--bg);
+  color: var(--text-secondary);
+}
+
+.loading-spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--bg-tertiary);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Stop Markers - with map pin */
+.stop-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stop-pin {
+  width: 20px;
+  height: 20px;
+  background: var(--accent);
+  border: 2px solid white;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.stop-pin::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+}
+
+.stop-marker-label {
+  padding: 4px 8px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Shuttle Marker with pin */
+.shuttle-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.shuttle-label {
+  background: #ff9500;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.shuttle-pin {
+  width: 28px;
+  height: 28px;
+  background: #ff9500;
+  border: 3px solid white;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.shuttle-pin::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+}
+
+.shuttle-icon {
+  font-size: 2rem;
+}
+
+/* Footer (ETA Panel) - iOS Card */
+.app-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px;
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+.eta-panel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 14px;
+  box-shadow: var(--card-shadow);
+}
+
+.eta-icon {
+  font-size: 2rem;
+}
+
+.eta-content {
+  flex: 1;
+}
+
+.eta-label {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+
+.eta-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text);
+}
+
+.eta-time {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.eta-minutes {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.eta-unit {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.eta-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.eta-live-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  background: rgba(48, 209, 88, 0.15);
+  border-radius: 8px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--success);
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--success);
+  border-radius: 50%;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.eta-panel.inactive {
+  opacity: 0.6;
+}
+
+/* Notification Toast - iOS style */
+.notification {
+  position: fixed;
+  top: 70px;
+  left: 16px;
+  right: 16px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-secondary);
+  border-radius: 14px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+  transform: translateY(-120%);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.notification.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.notification-icon {
+  font-size: 1.5rem;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.notification-body {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .app-header {
+    padding: 12px 16px;
+  }
+
+  .app-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .eta-panel {
+    padding: 14px;
+  }
+
+  .eta-icon {
+    font-size: 1.75rem;
+  }
+}
