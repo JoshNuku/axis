@@ -67,6 +67,11 @@ header h1 {
   letter-spacing: -0.5px;
 }
 
+.app-logo {
+  height: 48px;
+  width: auto;
+}
+
 .header-right {
   display: flex;
   align-items: center;

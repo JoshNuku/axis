@@ -2,9 +2,7 @@
 // Fetched from server at runtime - no secrets in this file
 
 let CONFIG = {
-    SERVER_URL: window.location.origin.includes('localhost')
-        ? 'http://localhost:3001'
-        : window.location.origin,  // Use same origin in production
+    SERVER_URL: 'http://localhost:3001',
     MAPBOX_TOKEN: null
 };
 

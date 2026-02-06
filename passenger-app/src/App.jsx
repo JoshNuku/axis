@@ -66,7 +66,7 @@ function App() {
       />
 
       <header className="app-header">
-        <h1>🚌 Axis</h1>
+        <img src="/logos/axis-high-resolution-logo-transparent.png" alt="Axis" className="app-logo" />
         <div className="header-right">
           <button className="theme-toggle" onClick={toggleTheme}>
             {isDarkMode ? '☀️' : '🌙'}

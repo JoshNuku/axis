@@ -74,6 +74,15 @@ body {
   letter-spacing: -0.5px;
 }
 
+.app-logo {
+  height: 48px;
+  width: auto;
+  background: var(--bg-secondary);
+  padding: 6px 12px;
+  border-radius: 10px;
+  margin-top: 12px;
+}
+
 .header-right {
   display: flex;
   align-items: center;
@@ -266,6 +275,7 @@ body {
   background: var(--bg-secondary);
   border-radius: 14px;
   box-shadow: var(--card-shadow);
+  margin-bottom: 16px;
 }
 
 .eta-icon {
