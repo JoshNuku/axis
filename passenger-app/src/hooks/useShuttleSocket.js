@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 
-const SERVER_URL = process.env.SERVER_URL;
+const SERVER_URL = process.env.VITE_SERVER_URL;
 
 export function useShuttleSocket() {
     const [isConnected, setIsConnected] = useState(false);
