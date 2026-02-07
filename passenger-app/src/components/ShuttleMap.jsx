@@ -43,17 +43,24 @@ async function fetchGoogleRoute(startLng, startLat, endLng, endLat) {
         const destination = `${endLat},${endLng}`;
         const url = `${SERVER_URL}/api/directions?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`;
 
+        console.log('Fetching directions from:', url);
         const response = await fetch(url);
         const data = await response.json();
+        console.log('Directions API response:', data);
 
         if (data.routes && data.routes.length > 0) {
             const encodedPolyline = data.routes[0].overview_polyline.points;
-            return decodePolyline(encodedPolyline);
+            const coords = decodePolyline(encodedPolyline);
+            console.log('Decoded route coordinates:', coords.length, 'points');
+            return coords;
+        } else {
+            console.log('No routes in response, using straight line');
         }
     } catch (err) {
-        console.log('Error fetching route:', err);
+        console.error('Error fetching route:', err);
     }
     // Fallback to straight line
+    console.log('Using fallback straight line');
     return [[startLng, startLat], [endLng, endLat]];
 }
 
@@ -126,9 +133,15 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
                 );
                 cachedRouteStop.current = nearestStop.id;
                 cachedRouteCoords.current = routeCoordinates;
-            } else {
+            } else if (cachedRouteCoords.current && cachedRouteCoords.current.length > 1) {
                 // Use cached route but update start point to current position
                 routeCoordinates = [[position.lng, position.lat], ...cachedRouteCoords.current.slice(1)];
+            } else {
+                // Fallback to straight line if no valid cache
+                routeCoordinates = [
+                    [position.lng, position.lat],
+                    nearestStop.coordinates
+                ];
             }
 
             const lineData = {
