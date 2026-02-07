@@ -221,9 +221,7 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
         map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
         map.current.on('load', () => {
-            setMapLoaded(true);
-
-            // Add the route line source and layer
+            // Add the route line source and layer FIRST
             map.current.addSource('route-line', {
                 type: 'geojson',
                 data: {
@@ -297,6 +295,9 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
                     .setLngLat(stop.coordinates)
                     .addTo(map.current);
             });
+
+            // Set mapLoaded AFTER everything is initialized
+            setMapLoaded(true);
         });
 
         // Re-add layers after style change
