@@ -370,6 +370,40 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
     useEffect(() => {
         if (map.current && mapLoaded) {
             map.current.setStyle(mapStyle);
+
+            // Re-add route line source and layers after style loads (style change removes them)
+            map.current.once('style.load', () => {
+                if (!map.current.getSource('route-line')) {
+                    map.current.addSource('route-line', {
+                        type: 'geojson',
+                        data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] } }
+                    });
+
+                    map.current.addLayer({
+                        id: 'route-line-glow',
+                        type: 'line',
+                        source: 'route-line',
+                        layout: { 'line-join': 'round', 'line-cap': 'round' },
+                        paint: { 'line-color': '#007aff', 'line-width': 12, 'line-opacity': 0.3, 'line-blur': 3 }
+                    });
+
+                    map.current.addLayer({
+                        id: 'route-line-main',
+                        type: 'line',
+                        source: 'route-line',
+                        layout: { 'line-join': 'round', 'line-cap': 'round' },
+                        paint: { 'line-color': '#007aff', 'line-width': 5, 'line-opacity': 0.9 }
+                    });
+
+                    map.current.addLayer({
+                        id: 'route-line-dash',
+                        type: 'line',
+                        source: 'route-line',
+                        layout: { 'line-join': 'round', 'line-cap': 'round' },
+                        paint: { 'line-color': '#ffffff', 'line-width': 2, 'line-dasharray': [2, 4], 'line-opacity': 0.6 }
+                    });
+                }
+            });
         }
     }, [isDarkMode, mapStyle, mapLoaded]);
 
