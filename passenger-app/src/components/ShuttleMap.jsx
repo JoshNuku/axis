@@ -155,7 +155,10 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
 
             const source = map.current.getSource('route-line');
             if (source) {
+                console.log('Setting route line with', routeCoordinates.length, 'points');
                 source.setData(lineData);
+            } else {
+                console.warn('route-line source not found! Map might not be fully loaded.');
             }
         } catch (err) {
             console.log('Error updating route line:', err);
