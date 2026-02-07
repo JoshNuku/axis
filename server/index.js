@@ -55,6 +55,32 @@ app.get('/api/config', (req, res) => {
     });
 });
 
+// Google Directions API proxy (handles CORS for frontend)
+app.get('/api/directions', async (req, res) => {
+    try {
+        const { origin, destination } = req.query;
+
+        if (!origin || !destination) {
+            return res.status(400).json({ error: 'origin and destination are required' });
+        }
+
+        const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+        if (!apiKey || apiKey === 'YOUR_GOOGLE_MAPS_API_KEY_HERE') {
+            return res.status(500).json({ error: 'Google Maps API key not configured' });
+        }
+
+        const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${apiKey}`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        res.json(data);
+    } catch (err) {
+        console.error('Directions API error:', err);
+        res.status(500).json({ error: 'Failed to fetch directions' });
+    }
+});
+
 // Socket.io handling
 io.on('connection', (socket) => {
     console.log(`Client connected: ${socket.id}`);

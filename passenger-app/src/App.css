@@ -256,6 +256,23 @@ body {
   font-size: 2rem;
 }
 
+/* Animated shuttle - subtle bounce when moving */
+.shuttle-marker.animated .shuttle-icon {
+  animation: shuttleBounce 0.6s ease-in-out infinite;
+}
+
+@keyframes shuttleBounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
 /* Footer (ETA Panel) - iOS Card */
 .app-footer {
   position: absolute;
