@@ -104,6 +104,50 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
         ? 'mapbox://styles/mapbox/navigation-night-v1'
         : 'mapbox://styles/mapbox/navigation-day-v1';
 
+    // Helper to ensure route line source and layers exist
+    const ensureRouteLineLayers = useCallback(() => {
+        if (!map.current) return false;
+
+        if (!map.current.getSource('route-line')) {
+            try {
+                map.current.addSource('route-line', {
+                    type: 'geojson',
+                    data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] } }
+                });
+
+                map.current.addLayer({
+                    id: 'route-line-glow',
+                    type: 'line',
+                    source: 'route-line',
+                    layout: { 'line-join': 'round', 'line-cap': 'round' },
+                    paint: { 'line-color': '#007aff', 'line-width': 12, 'line-opacity': 0.3, 'line-blur': 3 }
+                });
+
+                map.current.addLayer({
+                    id: 'route-line-main',
+                    type: 'line',
+                    source: 'route-line',
+                    layout: { 'line-join': 'round', 'line-cap': 'round' },
+                    paint: { 'line-color': '#007aff', 'line-width': 5, 'line-opacity': 0.9 }
+                });
+
+                map.current.addLayer({
+                    id: 'route-line-dash',
+                    type: 'line',
+                    source: 'route-line',
+                    layout: { 'line-join': 'round', 'line-cap': 'round' },
+                    paint: { 'line-color': '#ffffff', 'line-width': 2, 'line-dasharray': [2, 4], 'line-opacity': 0.6 }
+                });
+
+                console.log('Created route-line source and layers');
+            } catch (err) {
+                console.log('Could not create route-line layers:', err);
+                return false;
+            }
+        }
+        return true;
+    }, []);
+
     // Update route line from bus to nearest stop (with caching to reduce API calls)
     const updateRouteLine = useCallback(async (position) => {
         if (!map.current || !mapLoaded) return;
@@ -153,17 +197,17 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
                 }
             };
 
+            // Ensure source exists before trying to set data
+            if (!ensureRouteLineLayers()) return;
+
             const source = map.current.getSource('route-line');
             if (source) {
-                console.log('Setting route line with', routeCoordinates.length, 'points');
                 source.setData(lineData);
-            } else {
-                console.warn('route-line source not found! Map might not be fully loaded.');
             }
         } catch (err) {
             console.log('Error updating route line:', err);
         }
-    }, [mapLoaded]);
+    }, [mapLoaded, ensureRouteLineLayers]);
 
     // Animate shuttle marker smoothly to new position
     const animateShuttle = useCallback((id, targetLng, targetLat) => {
