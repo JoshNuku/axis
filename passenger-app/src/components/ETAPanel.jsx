@@ -1,7 +1,6 @@
-import { useEffect, useMemo } from 'react';
 import legonStops from '../data/legonStops';
 
-// Haversine formula to calculate distance between two points
+// Get distance between two points in km (Haversine formula)
 function getDistanceKm(lat1, lon1, lat2, lon2) {
     const R = 6371; // Earth's radius in km
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -16,35 +15,21 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
 
 // Estimate ETA based on distance (assuming ~20 km/h average speed on campus)
 function estimateETA(distanceKm) {
+    if (!distanceKm || distanceKm <= 0) return 1;
     const speedKmPerHour = 20;
     const timeHours = distanceKm / speedKmPerHour;
     const timeMinutes = Math.round(timeHours * 60);
     return Math.max(1, timeMinutes); // At least 1 minute
 }
 
-function ETAPanel({ shuttlePosition, isActive }) {
-    const nearestStop = useMemo(() => {
-        if (!shuttlePosition || !isActive) return null;
+function ETAPanel({ shuttle, isActive }) {
+    // Use server-provided next stop (direction-aware) or fall back to nearest
+    const nextStop = shuttle?.nextStop || null;
+    const distanceToNextStop = shuttle?.distanceToNextStop || null;
+    const position = shuttle?.position || null;
 
-        let nearest = null;
-        let minDistance = Infinity;
-
-        for (const stop of legonStops) {
-            const distance = getDistanceKm(
-                shuttlePosition.lat,
-                shuttlePosition.lng,
-                stop.coordinates[1], // lat
-                stop.coordinates[0]  // lng
-            );
-
-            if (distance < minDistance) {
-                minDistance = distance;
-                nearest = { ...stop, distance, eta: estimateETA(distance) };
-            }
-        }
-
-        return nearest;
-    }, [shuttlePosition, isActive]);
+    // Calculate ETA to next stop
+    const eta = distanceToNextStop ? estimateETA(distanceToNextStop) : null;
 
     if (!isActive) {
         return (
@@ -59,7 +44,7 @@ function ETAPanel({ shuttlePosition, isActive }) {
         );
     }
 
-    if (!shuttlePosition) {
+    if (!position) {
         return (
             <div className="eta-panel connecting">
                 <div className="eta-icon">📡</div>
@@ -77,9 +62,9 @@ function ETAPanel({ shuttlePosition, isActive }) {
             <div className="eta-icon">🚌</div>
             <div className="eta-content">
                 <div className="eta-label">Next Stop</div>
-                <div className="eta-value">{nearestStop?.name || 'Unknown'}</div>
+                <div className="eta-value">{nextStop?.name || 'Unknown'}</div>
                 <div className="eta-time">
-                    <span className="eta-minutes">~{nearestStop?.eta || '?'}</span>
+                    <span className="eta-minutes">~{eta || '?'}</span>
                     <span className="eta-unit">min</span>
                 </div>
             </div>

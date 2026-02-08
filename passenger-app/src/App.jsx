@@ -1,45 +1,21 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ShuttleMap from './components/ShuttleMap';
 import ETAPanel from './components/ETAPanel';
 import Notification, { useNotifications } from './components/Notification';
 import { useShuttleSocket } from './hooks/useShuttleSocket';
-import legonStops from './data/legonStops';
 import './App.css';
-
-// Helper to find nearest stop
-function getNearestStop(shuttlePosition) {
-  if (!shuttlePosition) return null;
-
-  let nearest = null;
-  let minDistance = Infinity;
-
-  for (const stop of legonStops) {
-    const dlat = shuttlePosition.lat - stop.coordinates[1];
-    const dlng = shuttlePosition.lng - stop.coordinates[0];
-    const distance = Math.sqrt(dlat * dlat + dlng * dlng);
-
-    if (distance < minDistance) {
-      minDistance = distance;
-      nearest = stop;
-    }
-  }
-
-  return nearest;
-}
 
 function App() {
   const { isConnected, shuttles, shuttlePosition, isShuttleActive } = useShuttleSocket();
   const [isDarkMode, setIsDarkMode] = useState(true);
 
-  const nearestStop = useMemo(() =>
-    getNearestStop(shuttlePosition),
-    [shuttlePosition]
-  );
+  // Get the first (primary) shuttle with all its data
+  const primaryShuttle = shuttles[0] || null;
 
   const { notification, dismissNotification } = useNotifications(
     shuttlePosition,
     isShuttleActive,
-    nearestStop?.name
+    primaryShuttle?.nextStop?.name
   );
 
   // Load theme from localStorage or system preference
@@ -87,7 +63,7 @@ function App() {
 
       <footer className="app-footer">
         <ETAPanel
-          shuttlePosition={shuttlePosition}
+          shuttle={primaryShuttle}
           isActive={isShuttleActive}
         />
       </footer>

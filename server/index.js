@@ -2,7 +2,7 @@ const express = require('express');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
-const { legonStops, defaultRoute } = require('./routes');
+const { legonStops, defaultRoute, calculateBearing, getNextStopInDirection, getDistanceKm } = require('./routes');
 require('dotenv').config();
 
 const app = express();
@@ -113,9 +113,26 @@ io.on('connection', (socket) => {
         if (!id) return;
 
         const shuttle = shuttles.get(id) || { id, isActive: true };
+        const prevPosition = shuttle.position;
+
+        // Calculate heading from previous position
+        let heading = shuttle.heading || 0;
+        if (prevPosition && (prevPosition.lat !== lat || prevPosition.lng !== lng)) {
+            heading = calculateBearing(prevPosition.lat, prevPosition.lng, lat, lng);
+        }
+
+        // Get next stop based on position and heading
+        const nextStop = getNextStopInDirection(lat, lng, heading);
+        const distanceToNextStop = nextStop
+            ? getDistanceKm(lat, lng, nextStop.coordinates[0], nextStop.coordinates[1])
+            : null;
+
         shuttles.set(id, {
             ...shuttle,
             position: { lat, lng },
+            heading,
+            nextStop: nextStop ? { id: nextStop.id, name: nextStop.name, coordinates: nextStop.coordinates } : null,
+            distanceToNextStop,
             isActive: true,
             lastUpdate: new Date().toISOString()
         });
@@ -124,11 +141,14 @@ io.on('connection', (socket) => {
             id,
             lat,
             lng,
+            heading,
+            nextStop: nextStop ? { id: nextStop.id, name: nextStop.name, coordinates: nextStop.coordinates } : null,
+            distanceToNextStop,
             isActive: true,
             timestamp: new Date().toISOString()
         });
 
-        console.log(`Shuttle ${id} at ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+        console.log(`Shuttle ${id} at ${lat.toFixed(5)}, ${lng.toFixed(5)} heading ${heading.toFixed(0)}° -> ${nextStop?.name || 'unknown'}`);
     });
 
     // Driver starts

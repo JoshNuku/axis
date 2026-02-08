@@ -38,11 +38,18 @@ export function useShuttleSocket() {
 
         // Individual shuttle update
         socket.on('shuttle:update', (data) => {
-            const { id, lat, lng, isActive } = data;
+            const { id, lat, lng, isActive, heading, nextStop, distanceToNextStop } = data;
             if (isActive && lat && lng) {
                 setShuttles(prev => ({
                     ...prev,
-                    [id]: { id, position: { lat, lng }, isActive }
+                    [id]: {
+                        id,
+                        position: { lat, lng },
+                        heading: heading || 0,
+                        nextStop: nextStop || null,
+                        distanceToNextStop: distanceToNextStop || null,
+                        isActive
+                    }
                 }));
             }
         });

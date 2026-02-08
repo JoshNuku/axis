@@ -64,22 +64,10 @@ async function fetchGoogleRoute(startLng, startLat, endLng, endLat) {
     return [[startLng, startLat], [endLng, endLat]];
 }
 
-// Helper to find the nearest stop to a position
-function findNearestStop(position) {
-    if (!position) return null;
-    let nearest = null;
-    let minDist = Infinity;
-
-    legonStops.forEach(stop => {
-        const dx = stop.coordinates[0] - position.lng;
-        const dy = stop.coordinates[1] - position.lat;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < minDist) {
-            minDist = dist;
-            nearest = stop;
-        }
-    });
-    return nearest;
+// Helper to find stop by ID from server-provided nextStop
+function findStopById(stopId) {
+    if (!stopId) return null;
+    return legonStops.find(stop => stop.id === stopId) || null;
 }
 
 // Helper to interpolate between two positions
@@ -148,13 +136,14 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
         return true;
     }, []);
 
-    // Update route line from bus to nearest stop (with caching to reduce API calls)
-    const updateRouteLine = useCallback(async (position) => {
+    // Update route line from bus to next stop (with caching to reduce API calls)
+    const updateRouteLine = useCallback(async (position, nextStopData) => {
         if (!map.current || !mapLoaded) return;
 
         try {
-            const nearestStop = findNearestStop(position);
-            if (!nearestStop || !position) {
+            // Use server-provided next stop or fall back to finding by ID
+            const nextStop = nextStopData ? findStopById(nextStopData.id) : null;
+            if (!nextStop || !position) {
                 if (map.current.getSource('route-line')) {
                     map.current.getSource('route-line').setData({
                         type: 'Feature',
@@ -169,13 +158,13 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
             let routeCoordinates;
 
             // Only fetch new route if destination stop changed
-            if (cachedRouteStop.current !== nearestStop.id) {
-                console.log(`Fetching route to ${nearestStop.name} (new destination)`);
+            if (cachedRouteStop.current !== nextStop.id) {
+                console.log(`Fetching route to ${nextStop.name} (new destination)`);
                 routeCoordinates = await fetchGoogleRoute(
                     position.lng, position.lat,
-                    nearestStop.coordinates[0], nearestStop.coordinates[1]
+                    nextStop.coordinates[0], nextStop.coordinates[1]
                 );
-                cachedRouteStop.current = nearestStop.id;
+                cachedRouteStop.current = nextStop.id;
                 cachedRouteCoords.current = routeCoordinates;
             } else if (cachedRouteCoords.current && cachedRouteCoords.current.length > 1) {
                 // Use cached route but update start point to current position
@@ -184,7 +173,7 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
                 // Fallback to straight line if no valid cache
                 routeCoordinates = [
                     [position.lng, position.lat],
-                    nearestStop.coordinates
+                    nextStop.coordinates
                 ];
             }
 
@@ -237,7 +226,7 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
             shuttle.currentPos = { lng: currentLng, lat: currentLat };
 
             // Update route line to follow the animated position
-            updateRouteLine(shuttle.currentPos);
+            updateRouteLine(shuttle.currentPos, shuttle.nextStop);
 
             if (progress < 1) {
                 shuttle.animationFrame = requestAnimationFrame(animate);
@@ -467,16 +456,31 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
             seenIds.add(id);
 
             if (shuttleMarkers.current[id]) {
+                // Update nextStop and heading on the marker object
+                shuttleMarkers.current[id].nextStop = shuttle.nextStop || null;
+                shuttleMarkers.current[id].heading = shuttle.heading || 0;
+
+                // Update car rotation based on heading
+                const carEl = shuttleMarkers.current[id].marker.getElement().querySelector('.shuttle-car');
+                if (carEl) {
+                    carEl.style.transform = `rotate(${shuttle.heading || 0}deg)`;
+                }
+
                 // Animate existing marker to new position
                 animateShuttle(id, position.lng, position.lat);
             } else {
-                // Create new marker
+                // Create new marker with car silhouette design
+                const heading = shuttle.heading || 0;
                 const el = document.createElement('div');
-                el.className = 'shuttle-marker animated';
+                el.className = 'shuttle-marker';
                 el.innerHTML = `
-          <div class="shuttle-label">Shuttle ${id}</div>
-          <div class="shuttle-icon">🚌</div>
-        `;
+                    <div class="shuttle-label">Shuttle ${id}</div>
+                    <div class="shuttle-car" style="transform: rotate(${heading}deg)">
+                        <div class="shuttle-car-pulse"></div>
+                        <div class="shuttle-car-wheels"></div>
+                        <div class="shuttle-car-body"></div>
+                    </div>
+                `;
 
                 const marker = new mapboxgl.Marker(el)
                     .setLngLat([position.lng, position.lat])
@@ -486,6 +490,8 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
                     marker,
                     currentPos: { lng: position.lng, lat: position.lat },
                     targetPos: { lng: position.lng, lat: position.lat },
+                    nextStop: shuttle.nextStop || null,
+                    heading: heading,
                     animationFrame: null
                 };
             }
@@ -493,7 +499,7 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
 
         // Always update route line for the first shuttle (outside the loop to avoid race conditions)
         if (shuttles.length > 0 && shuttles[0].position) {
-            updateRouteLine(shuttles[0].position);
+            updateRouteLine(shuttles[0].position, shuttles[0].nextStop);
         }
 
         // Remove markers for shuttles that are no longer active
