@@ -460,25 +460,27 @@ function ShuttleMap({ shuttles = [], isDarkMode = true }) {
                 shuttleMarkers.current[id].nextStop = shuttle.nextStop || null;
                 shuttleMarkers.current[id].heading = shuttle.heading || 0;
 
-                // Update car rotation based on heading
-                const carEl = shuttleMarkers.current[id].marker.getElement().querySelector('.shuttle-car');
-                if (carEl) {
-                    carEl.style.transform = `rotate(${shuttle.heading || 0}deg)`;
+                // Update arrow rotation based on heading
+                const arrowEl = shuttleMarkers.current[id].marker.getElement().querySelector('.shuttle-arrow');
+                if (arrowEl) {
+                    arrowEl.style.transform = `rotate(${shuttle.heading || 0}deg)`;
                 }
 
                 // Animate existing marker to new position
                 animateShuttle(id, position.lng, position.lat);
             } else {
-                // Create new marker with car silhouette design
+                // Create new marker with Google Maps style dot + arrow
                 const heading = shuttle.heading || 0;
                 const el = document.createElement('div');
                 el.className = 'shuttle-marker';
+
+                // Simple pulsing dot with direction arrow
                 el.innerHTML = `
                     <div class="shuttle-label">Shuttle ${id}</div>
-                    <div class="shuttle-car" style="transform: rotate(${heading}deg)">
-                        <div class="shuttle-car-pulse"></div>
-                        <div class="shuttle-car-wheels"></div>
-                        <div class="shuttle-car-body"></div>
+                    <div class="shuttle-dot-container">
+                        <div class="shuttle-pulse"></div>
+                        <div class="shuttle-dot"></div>
+                        <div class="shuttle-arrow" style="transform: rotate(${heading}deg)"></div>
                     </div>
                 `;
 
