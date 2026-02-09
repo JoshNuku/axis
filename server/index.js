@@ -163,10 +163,14 @@ io.on('connection', (socket) => {
     // Driver stops
     socket.on('driver:stop', () => {
         if (!driverShuttleId) return;
-        shuttles.delete(driverShuttleId);
+        const shuttle = shuttles.get(driverShuttleId);
+        if (shuttle) {
+            // Mark as inactive but preserve the shuttle entry
+            shuttles.set(driverShuttleId, { ...shuttle, isActive: false, position: null });
+        }
         io.emit('shuttle:active', { id: driverShuttleId, isActive: false });
-        console.log(`Shuttle ${driverShuttleId} stopped`);
-        driverShuttleId = null;
+        console.log(`Shuttle ${driverShuttleId} stopped (paused)`);
+        // Don't null the driverShuttleId - allow restart on same connection
     });
 
     socket.on('disconnect', () => {
